@@ -45,7 +45,8 @@
                    (let [props (.-props this)
                          author-dom (.getDOMNode (.-author (.-refs this)))
                          text-dom (.getDOMNode (.-text (.-refs this)))]
-                     (.newComment props {:author (.-value author-dom) :text (.-value text-dom)}))))}))
+                     (.newComment props {:author (.-value author-dom) :text (.-value text-dom)})))
+          false)})) ; this prevents submitting the form to the "server" and reloading everything
         
 
         
@@ -72,4 +73,4 @@
 (js/React.renderComponent
  (CommentBox #js {:comments [{:author "Mike Sperber" :text "Mikes Kommentar."}
                              {:author "David Frese" :text "Davids Kommentar."}]})
- (.getElementById js/document "content")) 
+ (.getElementById js/document "content"))
