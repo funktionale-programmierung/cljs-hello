@@ -6,11 +6,11 @@
   (js/React.createClass
    #js {:render (fn []
                   (this-as this
-                           (let [comment (.. this -props -comment)]
+                           (let [props (.-props this)]
                              (js/React.DOM.div
                               nil
-                              (js/React.DOM.h2 nil  (:author comment))
-                              (js/React.DOM.span nil (:text comment))))))}))
+                              (js/React.DOM.h2 nil  (.-author props))
+                              (js/React.DOM.span nil (.-text props))))))}))
 
 (def CommentList 
   (js/React.createClass
@@ -19,32 +19,28 @@
                            (js/React.DOM.div
                             nil
                             (into-array
-                             (map #(Comment #js {:comment %})
-                                  (.. this -props -comments))))))}))
+                             (map (fn [c] (Comment #js {:author (:author c) :text (:text c)}))
+                                  (.-comments (.-props this)))))))}))
 
 (def NewComment
   (js/React.createClass
    #js {:render
         (fn []
           (this-as this
-                   (let [props (.-props this)]
-                     (js/React.DOM.form
-                      #js {:onSubmit (.-handleSubmit this)}
-                      (js/React.DOM.input
-                       #js {:type "text"
-                            :ref "author"})
-                      (js/React.DOM.input
-                       #js {:type "text"
-                            :ref "text"})
-                      (js/React.DOM.button
-                       nil
-                       "Submit")))))
+                   (js/React.DOM.form
+                    #js {:onSubmit (.-handleSubmit this)}
+                    (js/React.DOM.input
+                     #js {:type "text" :ref "author"})
+                    (js/React.DOM.input
+                     #js {:type "text" :ref "text"})
+                    (js/React.DOM.button nil "Submit"))))
         :handleSubmit
         (fn [e]
           (this-as this
                    (let [props (.-props this)
-                         author-dom (.getDOMNode (.-author (.-refs this)))
-                         text-dom (.getDOMNode (.-text (.-refs this)))]
+                         refs (.-refs this)
+                         author-dom (.getDOMNode (.-author refs))
+                         text-dom (.getDOMNode (.-text refs))]
                      (.newComment props {:author (.-value author-dom) :text (.-value text-dom)})))
           false)})) ; this prevents submitting the form to the "server" and reloading everything
         
@@ -61,8 +57,7 @@
                            (js/React.DOM.div
                             nil
                             (js/React.DOM.h1 nil "Comments")
-                            (CommentList #js {:comments (.-comments (.-state this))
-                                              :newComment (.-newComment this)})
+                            (CommentList #js {:comments (.-comments (.-state this))})
                             (js/React.DOM.h2 nil "New Comment")
                             (NewComment #js {:newComment (.-newComment this)}))))
         :newComment 
